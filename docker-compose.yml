@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      JWT_KEY: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
+      DB_URL: localhost:3306
+      DB_USER: root
+      DB_PASSWORD: nada5011
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD:
+    depends_on:
+      - mysql
+      - redis
+
+  mysql:
+    image: mysql:8.0.37  # MySQL 이미지 지정
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: nada5011
+      MYSQL_DATABASE: intern
+      MYSQL_USER: root
+      MYSQL_PASSWORD: nada5011
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: redis:6.2  # Redis 이미지 지정
+    restart: always
+    ports:
+      - "6379:6379"
