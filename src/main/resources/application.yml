@@ -3,15 +3,15 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://${DB_URL}/intern
+    url: jdbc:mysql://${DB_URL}/${DB_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
       repositories:
         enabled: false
 
