@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DEPENDENCY: build/dependency  # 빌드 인자를 설정
     ports:
       - "8080:8080"
     environment:
@@ -23,10 +25,9 @@ services:
     image: mysql:8.0.37  # MySQL 이미지 지정
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: nada5011
-      MYSQL_DATABASE: intern
-      MYSQL_USER: root
-      MYSQL_PASSWORD: nada5011
+      DB_NAME: intern
+      DB_USER: root
+      DB_PASSWORD: nada5011
     ports:
       - "3306:3306"
 
