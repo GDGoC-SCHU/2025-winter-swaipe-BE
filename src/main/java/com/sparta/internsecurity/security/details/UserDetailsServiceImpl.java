@@ -1,7 +1,7 @@
 package com.sparta.internsecurity.security.details;
 
 import com.sparta.internsecurity.user.entity.User;
-import com.sparta.internsecurity.user.repository.UserRepositroy;
+import com.sparta.internsecurity.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepositroy userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
