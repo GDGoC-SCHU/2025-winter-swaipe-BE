@@ -5,7 +5,7 @@ import com.sparta.internsecurity.security.details.UserDetailsServiceImpl;
 import com.sparta.internsecurity.user.dto.SignupResponseDto;
 import com.sparta.internsecurity.user.dto.SignupUserDto;
 import com.sparta.internsecurity.user.entity.User;
-import com.sparta.internsecurity.user.repository.UserRepositroy;
+import com.sparta.internsecurity.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepositroy userRepositroy;
+    private final UserRepository userRepository;
     private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -23,7 +23,7 @@ public class UserService {
     public SignupResponseDto signup(SignupUserDto userDto) {
         User user = userDto.signup(passwordEncoder.encode(userDto.getPassword()));
 
-        userRepositroy.save(user);
+        userRepository.save(user);
         return new SignupResponseDto(user, (UserDetailsImpl) userDetailsService.loadUserByUsername(user.getUsername()));
     }
 }
