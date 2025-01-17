@@ -5,34 +5,37 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DEPENDENCY: build/dependency  # 빌드 인자를 설정
+        DEPENDENCY: build/dependency
     ports:
-      - "8080:8080"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     environment:
-      SERVER_PORT: 8080
-      JWT_KEY: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
-      DB_URL: localhost:3306
-      DB_USER: root
-      DB_PASSWORD: nada5011
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD:
+      SERVER_PORT: ${SERVER_PORT}
+      DB_URL: ${DB_URL}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      JWT_KEY: ${JWT_KEY}
     depends_on:
       - mysql
       - redis
 
   mysql:
-    image: mysql:8.0.37  # MySQL 이미지 지정
+    image: mysql:8.0.37
     restart: always
     environment:
-      DB_NAME: intern
-      DB_USER: root
-      DB_PASSWORD: nada5011
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT}:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
 
   redis:
-    image: redis:6.2  # Redis 이미지 지정
+    image: redis:6.2
     restart: always
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    command: redis-server --appendonly yes

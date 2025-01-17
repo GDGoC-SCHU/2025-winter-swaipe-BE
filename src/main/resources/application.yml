@@ -32,13 +32,23 @@ jwt-secret-key: ${JWT_KEY}
 
 springdoc:
   swagger-ui:
-    path: /api-test  # swagger-ui 접근 경로에 대한 별칭, 해당 주소로 접속해도 http://localhost:8080/swagger-ui/index.html로 리다이렉션 됨.
-
-    groups-order: DESC # path, query, body, response 순으로 출력
-
-    tags-sorter: alpha # 태그를 알파벳 순으로 정렬
-
-    operations-sorter: method  # delete - get - patch - post - put 순으로 정렬, alpha를 사용하면 알파벳 순으로 정렬 가능
-
+    path: /swagger-ui.html
+    enabled: true
+    groups-order: DESC
+    tags-sorter: alpha
+    operations-sorter: method
+    default-models-expand-depth: -1
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
   paths-to-match:
-    - /users/** # swagger-ui에 표시할 api의 엔드포인트 패턴
+    - /users/**
+    - /v3/api-docs/**
+    - /v3/api-docs.yaml
+    - /swagger-resources/**
+    - /swagger-ui/**
+    - /webjars/**
+  show-actuator: false
+  packages-to-scan: com.donut.swab
