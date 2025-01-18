@@ -22,6 +22,14 @@ import com.donut.swab.global.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 인증 관련 비즈니스 로직을 처리하는 서비스 클래스
+ * 토큰 재발급, 로그아웃, 회원탈퇴 등의 기능을 제공합니다.
+ *
+ * @author donut
+ * @version 1.0
+ * @since 2024-01-19
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,6 +41,13 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	/**
+	 * 토큰을 재발급합니다.
+	 *
+	 * @param tokenRequestDto 재발급 요청 DTO
+	 * @return 새로운 액세스 토큰이 포함된 응답
+	 * @throws InvalidTokenException 토큰이 유효하지 않은 경우
+	 */
 	public ApiResponse<TokenDto> refresh(TokenRequestDto tokenRequestDto) {
 		String token = tokenRequestDto.getToken();
 		

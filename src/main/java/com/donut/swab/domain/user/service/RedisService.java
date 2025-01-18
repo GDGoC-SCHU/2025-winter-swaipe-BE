@@ -11,6 +11,14 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Redis를 활용한 리프레시 토큰 관리 서비스
+ * 토큰의 저장, 조회, 삭제 기능을 제공합니다.
+ *
+ * @author donut
+ * @version 1.0
+ * @since 2024-01-19
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,6 +27,12 @@ public class RedisService {
 	private final RedisTemplate<String, String> redisTemplate;
 	private static final String REFRESH_TOKEN_PREFIX = "RT:";
 
+	/**
+	 * 리프레시 토큰을 Redis에 저장합니다.
+	 *
+	 * @param username 사용자 아이디
+	 * @param refreshToken 리프레시 토큰
+	 */
 	@Transactional
 	public void saveRefreshToken(String username, String refreshToken) {
 		try {

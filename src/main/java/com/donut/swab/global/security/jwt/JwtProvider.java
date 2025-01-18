@@ -1,6 +1,15 @@
 package com.donut.swab.global.security.jwt;
 
+import java.security.Key;
+import java.util.Base64;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
 import com.donut.swab.domain.user.enums.UserRole;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -9,15 +18,16 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import java.security.Key;
-import java.util.Base64;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
+/**
+ * JWT 토큰 생성 및 검증을 담당하는 클래스
+ * 
+ * @author donut
+ * @version 1.0
+ * @since 2024-01-19
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -42,10 +52,11 @@ public class JwtProvider {
 	}
 
 	/**
-	 * Access Token을 생성합니다.
+	 * 액세스 토큰을 생성합니다.
 	 *
-	 * @param username 사용자 이름
-	 * @param role     사용자 역할
+	 * @param username 사용자 아이디
+	 * @param role 사용자 권한
+	 * @return 생성된 액세스 토큰
 	 */
 	public String createAccessToken(String username, UserRole role) {
 		Date date = new Date();
