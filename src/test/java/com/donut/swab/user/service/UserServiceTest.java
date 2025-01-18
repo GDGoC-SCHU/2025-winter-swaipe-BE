@@ -6,13 +6,14 @@ import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.donut.swab.Auth.service.AuthService;
-import com.donut.swab.security.details.UserDetailsImpl;
-import com.donut.swab.security.jwt.JwtProvider;
-import com.donut.swab.user.dto.AccessTokenDto;
-import com.donut.swab.user.dto.LoginRequestDto;
-import com.donut.swab.user.entity.User;
-import com.donut.swab.user.enums.UserRole;
+import com.donut.swab.domain.Auth.service.AuthService;
+import com.donut.swab.domain.user.service.RedisService;
+import com.donut.swab.global.security.details.UserDetailsImpl;
+import com.donut.swab.global.security.jwt.JwtProvider;
+import com.donut.swab.Auth.dto.AccessTokenDto;
+import com.donut.swab.domain.user.dto.LoginRequestDto;
+import com.donut.swab.domain.user.entity.User;
+import com.donut.swab.domain.user.enums.UserRole;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,7 @@ class AuthServiceTest {
         // Given
         User user = Mockito.mock(User.class);  // User 객체에 대한 Mock 설정 추가
         when(user.getUserRole()).thenReturn(UserRole.USER);  // UserRole 설정
-        when(userDetails.getUser()).thenReturn(user);  // User 객체를 반환하도록 설정
+        when(userDetails.user()).thenReturn(user);  // User 객체를 반환하도록 설정
 
         when(authenticationManager.authenticate(
                 any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
