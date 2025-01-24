@@ -1,11 +1,11 @@
-package com.donut.swab.domain.user.service;
+package com.donut.swaipe.domain.user.service;
 
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import static com.donut.swab.global.security.jwt.JwtProvider.REFRESH_TOKEN_TIME;
+import static com.donut.swaipe.global.security.jwt.JwtProvider.REFRESH_TOKEN_TIME;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

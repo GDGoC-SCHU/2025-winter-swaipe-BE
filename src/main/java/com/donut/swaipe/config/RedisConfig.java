@@ -1,4 +1,4 @@
-package com.donut.swab.config;
+package com.donut.swaipe.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
