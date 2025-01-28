@@ -1,8 +1,11 @@
 package com.donut.swaipe.global.security.filter;
 
-import com.donut.swaipe.domain.Auth.dto.TokenDto;
+import static com.donut.swaipe.global.common.MessageCode.*;
+
+import com.donut.swaipe.domain.auth.dto.TokenDto;
 import com.donut.swaipe.domain.user.service.RedisService;
 import com.donut.swaipe.global.common.ApiResponse;
+import com.donut.swaipe.global.common.MessageCode;
 import com.donut.swaipe.global.security.details.UserDetailsImpl;
 import com.donut.swaipe.global.security.jwt.JwtProvider;
 import com.donut.swaipe.domain.user.dto.LoginRequestDto;
@@ -74,7 +77,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		response.setCharacterEncoding("UTF-8");
 
 		TokenDto tokenDto = new TokenDto(accessToken);
-		ApiResponse<TokenDto> apiResponse = ApiResponse.success("로그인 성공", tokenDto);
+		ApiResponse<TokenDto> apiResponse = ApiResponse.success(USER_LOGIN, tokenDto);
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		response.getWriter().write(objectMapper.writeValueAsString(apiResponse));

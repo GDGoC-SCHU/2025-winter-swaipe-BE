@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.donut.swaipe.domain.Auth.dto.TokenDto;
-import com.donut.swaipe.domain.Auth.dto.TokenRequestDto;
-import com.donut.swaipe.domain.Auth.service.AuthService;
+import com.donut.swaipe.domain.auth.dto.TokenDto;
+import com.donut.swaipe.domain.auth.dto.TokenRequestDto;
+import com.donut.swaipe.domain.auth.service.AuthService;
 import com.donut.swaipe.domain.user.dto.SignOutRequestDto;
 import com.donut.swaipe.domain.user.dto.SignUpRequestDto;
 import com.donut.swaipe.domain.user.dto.SignupResponseDto;

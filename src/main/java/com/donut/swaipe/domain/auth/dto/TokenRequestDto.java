@@ -1,4 +1,4 @@
-package com.donut.swaipe.domain.Auth.dto;
+package com.donut.swaipe.domain.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

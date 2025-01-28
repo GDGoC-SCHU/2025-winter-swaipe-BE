@@ -2,6 +2,8 @@ package com.donut.swaipe.global.security.details;
 
 import com.donut.swaipe.domain.user.entity.User;
 import com.donut.swaipe.domain.user.repository.UserRepository;
+import com.donut.swaipe.global.common.MessageCode;
+import com.donut.swaipe.global.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,9 +18,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByUsername(username).orElseThrow(
-				() -> new UsernameNotFoundException("Can't find user with username: " + username)
-		);
-		return new UserDetailsImpl(user);
+		return userRepository.findByUsername(username)
+				.map(UserDetailsImpl::new)
+				.orElseThrow(() -> new UserNotFoundException());
 	}
 }

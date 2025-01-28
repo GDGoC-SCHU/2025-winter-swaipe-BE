@@ -67,7 +67,7 @@ docker-compose up -d
 
 ### 📂 프로젝트 구조
 ```
-src/main/java/com/sparta/itsmine/
+src/main/java/com/sparta/donut/
 ├── 🔧 config/
 ├── 📦 domain/
 │   └── product/

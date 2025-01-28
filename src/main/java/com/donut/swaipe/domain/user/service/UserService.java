@@ -1,119 +1,124 @@
 package com.donut.swaipe.domain.user.service;
 
-import com.donut.swaipe.domain.user.dto.UpdateUserRequestDto;
-import com.donut.swaipe.domain.user.dto.UserInfoDto;
-import com.donut.swaipe.domain.user.mapper.UserMapper;
-import com.donut.swaipe.global.common.ApiResponse;
 import com.donut.swaipe.domain.user.dto.SignUpRequestDto;
 import com.donut.swaipe.domain.user.dto.SignupResponseDto;
+import com.donut.swaipe.domain.user.dto.UpdateUserRequestDto;
+import com.donut.swaipe.domain.user.dto.UserInfoDto;
 import com.donut.swaipe.domain.user.entity.User;
 import com.donut.swaipe.domain.user.enums.UserRole;
+import com.donut.swaipe.domain.user.mapper.UserMapper;
 import com.donut.swaipe.domain.user.repository.UserRepository;
-import com.donut.swaipe.global.exception.auth.UnauthorizedException;
+import com.donut.swaipe.global.common.ApiResponse;
+import com.donut.swaipe.global.common.MessageCode;
 import com.donut.swaipe.global.exception.user.SignUpFailedException;
 import com.donut.swaipe.global.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 사용자 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
+ *
+ * @author donut
+ * @version 1.1
+ * @since 2024-01-28
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final UserMapper userMapper;
 
-    @Transactional
-    public ApiResponse<SignupResponseDto> signup(SignUpRequestDto signupRequestDto) {
-        try {
-            // 아이디 중복 검사
-            if (userRepository.existsByUsername(signupRequestDto.getUsername())) {
-                throw new IllegalArgumentException("이미 존재하는 username 입니다.");
-            }
+	private final UserRepository userRepository;
+	private final UserMapper userMapper;
+	private final UserValidator userValidator;
 
-            // 비밀번호 인코딩 및 회원 생성
-            User user = User.builder()
-                    .username(signupRequestDto.getUsername())
-                    .password(passwordEncoder.encode(signupRequestDto.getPassword()))
-                    .nickname(signupRequestDto.getNickname())
-                    .build();
+	/**
+	 * 새로운 사용자를 등록합니다.
+	 *
+	 * @param signupRequestDto 회원가입 요청 정보
+	 * @return 회원가입 결과 및 사용자 정보
+	 * @throws SignUpFailedException 회원가입 처리 중 오류가 발생한 경우
+	 */
+	@Transactional
+	public ApiResponse<SignupResponseDto> signup(SignUpRequestDto signupRequestDto) {
+		userValidator.validateUsername(signupRequestDto.getUsername());
 
-            userRepository.save(user);
-            log.info("회원가입 완료: username={}", user.getUsername());
+		try {
+			User newUser = userMapper.toEntity(signupRequestDto);
+			User savedUser = userRepository.save(newUser);
 
-            return ApiResponse.success(
-                    "회원가입 성공",
-                    new SignupResponseDto(user.getId(), user.getUsername(), user.getNickname())
-            );
-        } catch (Exception e) {
-            log.error("회원가입 실패: {}", e.getMessage());
-            throw new SignUpFailedException("회원가입에 실패했습니다: " + e.getMessage());
-        }
-    }
+			log.info("회원가입 완료: username={}", savedUser.getUsername());
 
-    @Transactional(readOnly = true)
-    public ApiResponse<UserInfoDto> getUserInfo(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+			return ApiResponse.success(
+					MessageCode.SIGNUP_SUCCESS,
+					userMapper.toSignupResponseDto(savedUser)
+			);
+		} catch (Exception e) {
+			log.error("회원가입 실패: {}", e.getMessage());
+			throw new SignUpFailedException();
+		}
+	}
 
-        return ApiResponse.success(
-                "사용자 정보 조회 성공",
-                userMapper.toUserInfoDto(user)
-        );
-    }
+	/**
+	 * 사용자 정보를 업데이트합니다.
+	 *
+	 * @param username  업데이트할 사용자의 이름
+	 * @param updateDto 업데이트할 정보
+	 * @return 업데이트된 사용자 정보
+	 * @throws UserNotFoundException 사용자를 찾을 수 없는 경우
+	 */
+	@Transactional
+	public ApiResponse<UserInfoDto> updateUser(String username, UpdateUserRequestDto updateDto) {
+		User user = findUserByUsername(username);
 
-    @Transactional
-    public ApiResponse<UserInfoDto> updateUser(String username, UpdateUserRequestDto updateDto) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+		updateUserFields(user, updateDto);
 
-        if (updateDto.getNickname() != null) {
-            user.updateNickname(updateDto.getNickname());
-        }
-        if (updateDto.getPassword() != null) {
-            user.updatePassword(passwordEncoder.encode(updateDto.getPassword()));
-        }
+		return ApiResponse.success(
+				MessageCode.USER_UPDATE_SUCCESS,
+				userMapper.toUserInfoDto(user)
+		);
+	}
 
-        return ApiResponse.success(
-                "사용자 정보 수정 성공",
-                userMapper.toUserInfoDto(user)
-        );
-    }
+	/**
+	 * 사용자의 역할을 업데이트합니다.
+	 *
+	 * @param adminUsername  관리자 사용자명
+	 * @param targetUsername 권한을 변경할 대상 사용자명
+	 * @param newRole        새로운 권한
+	 * @throws UserNotFoundException 사용자를 찾을 수 없는 경우
+	 */
+	@Transactional
+	public void updateUserRole(String adminUsername, String targetUsername, UserRole newRole) {
+		User admin = findUserByUsername(adminUsername);
+		userValidator.validateAdminRole(admin);
 
-    // 관리자용 역할 변경 메소드
-    @Transactional
-    public void updateUserRole(String adminUsername, String targetUsername, UserRole newRole) {
-        User admin = userRepository.findByUsername(adminUsername)
-                .orElseThrow(() -> new UserNotFoundException("관리자를 찾을 수 없습니다."));
+		User targetUser = findUserByUsername(targetUsername);
+		targetUser.updateRole(newRole);
 
-        if (admin.getUserRole() != UserRole.MANAGER) {
-            throw new UnauthorizedException("관리자 권한이 필요합니다.");
-        }
+		log.info("사용자 권한 업데이트 완료: username={}, newRole={}", targetUsername, newRole);
+	}
 
-        User targetUser = userRepository.findByUsername(targetUsername)
-                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+	/**
+	 * 사용자 이름으로 사용자를 찾습니다.
+	 */
+	private User findUserByUsername(String username) {
+		return userRepository.findByUsername(username)
+				.orElseThrow(UserNotFoundException::new);
+	}
 
-        targetUser.updateRole(newRole);
-    }
+	/**
+	 * 사용자의 필드를 업데이트합니다.
+	 */
+	private void updateUserFields(User user, UpdateUserRequestDto updateDto) {
+		if (updateDto.getNickname() != null) {
+			userValidator.validateNickname(updateDto.getNickname());
+			user.updateNickname(updateDto.getNickname());
+		}
 
-    @Transactional(readOnly = true)
-    public ApiResponse<Boolean> checkUsername(String username) {
-        boolean exists = userRepository.existsByUsername(username);
-        return ApiResponse.success(
-                exists ? "이미 존재하는 username 입니다." : "사용 가능한 username 입니다.",
-                exists
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public ApiResponse<Boolean> checkNickname(String nickname) {
-        boolean exists = userRepository.existsByNickname(nickname);
-        return ApiResponse.success(
-                exists ? "이미 존재하는 nickname 입니다." : "사용 가능한 nickname 입니다.",
-                exists
-        );
-    }
+		if (updateDto.getPassword() != null) {
+			String encodedPassword = userMapper.encodePassword(updateDto.getPassword());
+			user.updatePassword(encodedPassword);
+		}
+	}
 }
