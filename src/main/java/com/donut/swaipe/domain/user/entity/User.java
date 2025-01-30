@@ -1,5 +1,6 @@
 package com.donut.swaipe.domain.user.entity;
 
+import com.donut.swaipe.domain.notification.enums.NotificationType;
 import com.donut.swaipe.domain.user.enums.UserRole;
 import com.donut.swaipe.global.common.TimeStamp;
 import jakarta.persistence.Column;
@@ -41,8 +42,18 @@ public class User extends TimeStamp {
 	@Column(nullable = false)
 	private String nickname;
 
+	private String fcmToken;
+
 	@Column(nullable = false)
 	private UserRole userRole = UserRole.USER;
+
+	@Column(nullable = false)
+	private boolean notificationEnabled = true;
+
+	@Column(nullable = false)
+	private int notificationFlags = DEFAULT_NOTIFICATION_FLAGS;
+
+	private static final int DEFAULT_NOTIFICATION_FLAGS = 0b11111; // 모든 알림 활성화
 
 	/**
 	 * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
@@ -56,9 +67,31 @@ public class User extends TimeStamp {
 		this.nickname = newNickname;
 	}
 
+
+
 	// 관리자만 호출 가능하도록 서비스 레이어에서 검증
 	public void updateRole(UserRole newRole) {
 		this.userRole = newRole;
+	}
+
+	public void updateFcmToken(String fcmToken) {
+		this.fcmToken = fcmToken;
+	}
+
+	public void updateNotificationEnabled(boolean enabled) {
+		this.notificationEnabled = enabled;
+	}
+
+	public boolean isNotificationTypeEnabled(NotificationType type) {
+		return (notificationFlags & (1 << type.ordinal())) != 0;
+	}
+
+	public void updateNotificationFlag(NotificationType type, boolean enabled) {
+		if (enabled) {
+			notificationFlags |= (1 << type.ordinal());
+		} else {
+			notificationFlags &= ~(1 << type.ordinal());
+		}
 	}
 
 

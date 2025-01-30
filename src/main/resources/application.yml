@@ -30,6 +30,11 @@ logging:
 
 jwt-secret-key: ${JWT_KEY}
 
+firebase:
+  credentials:
+    path: ${FIREBASE_CREDENTIALS_PATH}
+    server-key: ${FIREBASE_SERVER_KEY}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -45,10 +50,11 @@ springdoc:
   default-produces-media-type: application/json
   paths-to-match:
     - /users/**
+    - /api/v1/notifications/**
     - /v3/api-docs/**
     - /v3/api-docs.yaml
     - /swagger-resources/**
     - /swagger-ui/**
     - /webjars/**
   show-actuator: false
-  packages-to-scan: com.donut.swab
+  packages-to-scan: com.donut.swaipe

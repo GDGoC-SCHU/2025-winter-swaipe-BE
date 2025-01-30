@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>FCM 테스트</title>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    div {
+      margin-bottom: 20px;
+    }
+    textarea, input, select {
+      width: 100%;
+      margin-top: 5px;
+      padding: 5px;
+    }
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    pre {
+      background-color: #f4f4f4;
+      padding: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+<h1>FCM 알림 테스트</h1>
+<div>
+  <h3>FCM 토큰</h3>
+  <textarea id="fcmToken" rows="5" cols="50" readonly></textarea>
+</div>
+<div>
+  <h3>알림 보내기</h3>
+  <form id="notificationForm">
+    <div>
+      <label>제목:</label>
+      <input type="text" id="title" required/>
+    </div>
+    <div>
+      <label>메시지:</label>
+      <textarea id="message" required></textarea>
+    </div>
+    <div>
+      <label>타입:</label>
+      <select id="type">
+        <option value="SYSTEM">시스템</option>
+        <option value="LIKE">좋아요</option>
+        <option value="FOLLOW">팔로우</option>
+      </select>
+    </div>
+    <button type="submit">알림 전송</button>
+  </form>
+</div>
+<div>
+  <h3>결과</h3>
+  <pre id="result"></pre>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBY7Q0aneSmzEcp0aQ1SRlK5wsp9C4gWOY",
+    authDomain: "swaipe-d13ff.firebaseapp.com",
+    projectId: "swaipe-d13ff",
+    storageBucket: "swaipe-d13ff.firebasestorage.app",
+    messagingSenderId: "366542577324",
+    appId: "1:366542577324:web:4b6b9cf9eb5080d47e0909",
+    measurementId: "G-XM9N197HNS"
+  };
+
+  // Firebase 초기화
+  firebase.initializeApp(firebaseConfig);
+  const messaging = firebase.messaging();
+
+  // FCM 토큰 얻기
+  messaging.getToken().then((token) => {
+    document.getElementById('fcmToken').value = token;
+    console.log('FCM 토큰:', token);
+  }).catch((err) => {
+    console.error('FCM 토큰 에러:', err);
+    document.getElementById('result').innerText = `토큰 에러: ${err.message}`;
+  });
+
+  // 폼 제출 처리
+  document.getElementById('notificationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const token = document.getElementById('fcmToken').value;
+    const title = document.getElementById('title').value;
+    const message = document.getElementById('message').value;
+    const type = document.getElementById('type').value;
+
+    try {
+      const response = await fetch('/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token') // JWT 토큰
+        },
+        body: JSON.stringify({
+          userId: 1,
+          title: title,
+          message: message,
+          type: type,
+          fcmToken: token,
+          data: {
+            click_action: "MAIN_ACTIVITY"
+          }
+        })
+      });
+      const result = await response.json();
+      document.getElementById('result').innerText = JSON.stringify(result, null, 2);
+    } catch (error) {
+      document.getElementById('result').innerText = `에러: ${error.message}`;
+    }
+  });
+
+  // 메시지 수신 처리
+  messaging.onMessage((payload) => {
+    console.log('메시지 수신:', payload);
+    alert(`새 알림: ${payload.notification.title}\n${payload.notification.body}`);
+  });
+</script>
+</body>
+</html>

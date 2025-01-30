@@ -23,7 +23,7 @@ public class SwaggerConfig {
         Components components = new Components().addSecuritySchemes(jwtSchemeName, new SecurityScheme()
                 .name(jwtSchemeName)
                 .type(SecurityScheme.Type.HTTP) // HTTP 방식으로 설정
-                .scheme("bearer") // HTTP Bearer 방식 사용
+                .scheme("Bearer") // HTTP Bearer 방식 사용
                 .bearerFormat("JWT") // Bearer 토큰 형식은 JWT
         );
 
