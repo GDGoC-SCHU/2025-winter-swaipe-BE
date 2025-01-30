@@ -63,13 +63,18 @@ public class NotificationMapper {
 	}
 
 	public Message toFcmMessage(NotificationRequest request, String fcmToken) {
-		return Message.builder()
+		Message.Builder messageBuilder = Message.builder()
 				.setToken(fcmToken)
 				.setNotification(com.google.firebase.messaging.Notification.builder()
 						.setTitle(request.getTitle())
 						.setBody(request.getMessage())
-						.build())
-				.putAllData(request.getData())
-				.build();
+						.build());
+
+		// 데이터가 있는 경우에만 처리
+		if (request.getData() != null) {
+			messageBuilder.putAllData(request.getData());
+		}
+
+		return messageBuilder.build();
 	}
 }

@@ -24,6 +24,8 @@ repositories {
 }
 
 dependencies {
+    // Thymleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // redis
