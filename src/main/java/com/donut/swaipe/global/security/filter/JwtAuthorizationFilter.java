@@ -50,7 +50,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			"/v3/api-docs",
 			"/swagger-resources",
 			"/v3/api-docs.yaml",
-			"/webjars"
+			"/webjars",
+			"/favicion.ico",
+			"/test/notification",        // 경로 패턴 수정
+			"/templates/**",
+			"/api/v1/notifications"
 	);
 
 	private final JwtProvider jwtProvider;

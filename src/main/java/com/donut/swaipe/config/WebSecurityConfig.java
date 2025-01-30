@@ -64,7 +64,10 @@ public class WebSecurityConfig {
 			"/v3/api-docs",
 			"/swagger-resources",
 			"/v3/api-docs.yaml",
-			"/webjars"
+			"/webjars",
+			"/test/**",
+			"/templates/**",
+			"/api/v1/notifications"
 	);
 
 	private final JwtProvider jwtProvider;
@@ -164,6 +167,7 @@ public class WebSecurityConfig {
 				.requestMatchers(PathRequest.toStaticResources().atCommonLocations())
 				.permitAll()
 				.requestMatchers(SWAGGER_PATHS.toArray(String[]::new)).permitAll()
+				.requestMatchers(HttpMethod.GET, "/test/**", "/templates/**", "/favicon.ico").permitAll()
 				.requestMatchers(HttpMethod.POST, PERMIT_ALL_PATHS.toArray(String[]::new))
 				.permitAll()
 				.anyRequest().authenticated()
