@@ -133,4 +133,38 @@ public class JwtProvider {
 	public Long getRefreshTokenExpiration() {
 		return REFRESH_TOKEN_TIME;
 	}
+
+	public boolean isTokenExpired(String token) {
+		try {
+			Claims claims = Jwts.parserBuilder()
+					.setSigningKey(key)
+					.build()
+					.parseClaimsJws(token)
+					.getBody();
+			return claims.getExpiration().before(new Date());
+		} catch (ExpiredJwtException e) {
+			return true;
+		}
+	}
+
+	public String reissueAccessToken(String kakaoId) {
+		return createAccessToken(kakaoId);
+	}
+
+	public String getRefreshToken(String kakaoId) {
+		return redisTemplate.opsForValue().get("RT:" + kakaoId);
+	}
+
+	public boolean validateRefreshToken(String refreshToken) {
+		try {
+			Jwts.parserBuilder()
+					.setSigningKey(key)
+					.build()
+					.parseClaimsJws(refreshToken);
+			return true;
+		} catch (Exception e) {
+			log.error("Refresh 토큰 검증 실패: {}", e.getMessage());
+			return false;
+		}
+	}
 }

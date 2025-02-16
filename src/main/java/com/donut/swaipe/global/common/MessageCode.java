@@ -62,7 +62,16 @@ public enum MessageCode {
 	SMS_VERIFICATION_FAILED("S005", "잘못된 인증번호입니다."),
 	SMS_VERIFICATION_IN_PROGRESS("S006", "이미 진행 중인 인증이 있습니다."),
 	SMS_VERIFICATION_NOT_FOUND("S007", "진행 중인 인증을 찾을 수 없습니다."),
-	;
+
+	// 학생증 관련
+	STUDENT_CARD_SCAN_SUCCESS("SC001", "학생증 스캔이 완료되었습니다."),
+	STUDENT_CARD_SCAN_FAILED("SC002", "학생증 스캔에 실패했습니다."),
+	STUDENT_CARD_NOT_FOUND("SC003", "학생증을 찾을 수 없습니다."),
+	STUDENT_CARD_INVALID("SC004", "유효하지 않은 학생증입니다."),
+	BARCODE_READ_FAILED("SC005", "바코드 인식에 실패했습니다."),
+	OCR_READ_FAILED("SC006", "텍스트 인식에 실패했습니다."),
+	INVALID_UNIVERSITY_EMAIL("SC007", "유효하지 않은 대학교 이메일입니다."),
+	UNIVERSITY_EMAIL_VERIFIED("SC008", "대학 인증 완료했습니다.");
 
 	private final String code;
 	private final String message;

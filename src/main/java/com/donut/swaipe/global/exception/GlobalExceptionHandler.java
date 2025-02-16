@@ -18,11 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import com.donut.swaipe.global.exception.NoResourceFoundException;
 
 
 @Slf4j
@@ -228,12 +227,13 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(NoResourceFoundException.class)
-	public ResponseEntity<ApiResponse<?>> handleNoResourceFoundException(NoResourceFoundException ex) {
+	public ResponseEntity<ApiResponse<?>> handleNoResourceFoundException(
+			NoResourceFoundException ex) {
 		// favicon.ico 요청인 경우 204 응답
 		if (ex.getMessage().contains("favicon.ico")) {
 			return ResponseEntity.noContent().build();
 		}
-		
+
 		return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
 				.body(ApiResponse.error(MessageCode.RESOURCE_NOT_FOUND));
