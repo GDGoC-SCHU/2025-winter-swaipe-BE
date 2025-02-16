@@ -16,6 +16,7 @@ public enum MessageCode {
 	PAYMENT_CANCELLED("P003", "결제가 취소되었습니다."),
 
 	// User
+	SIGNIN_SUCCESS("U000", "로그인을 완료했습니다." ),
 	USER_NOT_FOUND("U001", "사용자를 찾을 수 없습니다."),
 	SIGNUP_FAILED("U006", "회원가입에 실패 했습니다."),
 	DUPLICATE_USERNAME("U002", "이미 사용 중인 아이디입니다."),
@@ -29,6 +30,7 @@ public enum MessageCode {
 	USER_LOGIN("U011", "로그인을 완료했습니다."),
 	LOGOUT_SUCCESS("U012", "로그아웃을 완료했습니다."),
 	SIGNOUT_SUCCESS("U013", "회원탈퇴에 성공했습니다."),
+	SIGNIN_FAILED("U014", "로그인에 실패했습니다." ),
 
 	// Auth
 	UNAUTHORIZED_ACCESS("A001", "권한이 없습니다."),
@@ -41,21 +43,26 @@ public enum MessageCode {
 	// Validation
 	INVALID_INPUT("V001", "입력값이 올바르지 않습니다."),
 
-	// Notification
-	NOTIFICATION_NOT_FOUND("N001", "알림을 찾을 수 없습니다."),
-	NOTIFICATION_SEND_FAILED("N002", "알림 발송에 실패했습니다."),
-	NOTIFICATION_ACCESS_DENIED("N003", "알림에 대한 접근 권한이 없습니다."),
-	INVALID_NOTIFICATION_REQUEST("N004", "잘못된 알림 요청입니다."),
-	INVALID_FCM_TOKEN("N005", "유효하지 않은 FCM 토큰입니다."),
-	NOTIFICATION_SEND_SUCCESS("N006", "알림 전송 완료했습니다."),
-	NOTIFICATION_LIST_SUCCESS("N007", "알림 목록 조회 완료했습니다."),
-	NOTIFICATION_DETAIL_SUCCESS("N008", "특정 알림 조회 완료했습니다."),
-	NOTIFICATION_READ_SUCCESS("N009", "알림을 읽으셨습니다."),
-	NOTIFICATION_DELETE_SUCCESS("N010", "알림 삭제 완료했습니다."),
-	NOTIFICATION_DISABLED("N011", "알림이 비활성화되어 있습니다."),
-	NOTIFICATION_TYPE_DISABLED("N012", "해당 유형의 알림이 비활성화되어 있습니다."),
-	NOTIFICATION_NO_TOKEN("N013", "FCM 토큰이 없습니다."),
-	NOTIFICATION_SEND_FAIL("N014", "알림 발송에 실패했습니다.");
+	// Kakao Auth
+	KAKAO_API_ERROR("K001", "카카오 API 호출 중 오류가 발생했습니다."),
+	KAKAO_TOKEN_NOT_FOUND("K002", "카카오 토큰을 찾을 수 없습니다."),
+	KAKAO_TOKEN_EXPIRED("K003", "카카오 토큰이 만료되었습니다."),
+	KAKAO_AUTH_FAILED("K004", "카카오 인증에 실패했습니다."),
+	KAKAO_USER_INFO_FAILED("K005", "카카오 사용자 정보 조회에 실패했습니다."),
+	KAKAO_TOKEN_REFRESH_FAILED("K006", "카카오 토큰 갱신에 실패했습니다."),
+
+	// Resource
+	RESOURCE_NOT_FOUND("R001", "요청한 리소스를 찾을 수 없습니다."),
+
+	// SMS 관련
+	SMS_SENT("S001", "인증번호가 발송되었습니다."),
+	SMS_VERIFIED("S002", "인증이 완료되었습니다."),
+	SMS_SEND_FAILED("S003", "인증번호 발송에 실패했습니다."),
+	SMS_CODE_EXPIRED("S004", "인증번호가 만료되었습니다."),
+	SMS_VERIFICATION_FAILED("S005", "잘못된 인증번호입니다."),
+	SMS_VERIFICATION_IN_PROGRESS("S006", "이미 진행 중인 인증이 있습니다."),
+	SMS_VERIFICATION_NOT_FOUND("S007", "진행 중인 인증을 찾을 수 없습니다."),
+	;
 
 	private final String code;
 	private final String message;

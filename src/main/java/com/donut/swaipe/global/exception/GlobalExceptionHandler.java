@@ -5,6 +5,10 @@ import com.donut.swaipe.global.common.MessageCode;
 import com.donut.swaipe.global.exception.auth.AuthenticationFailedException;
 import com.donut.swaipe.global.exception.auth.InvalidTokenException;
 import com.donut.swaipe.global.exception.auth.UnauthorizedAccessException;
+import com.donut.swaipe.global.exception.kakao.KakaoApiException;
+import com.donut.swaipe.global.exception.kakao.KakaoAuthException;
+import com.donut.swaipe.global.exception.kakao.KakaoTokenExpiredException;
+import com.donut.swaipe.global.exception.kakao.KakaoTokenNotFoundException;
 import com.donut.swaipe.global.exception.user.DuplicateNicknameException;
 import com.donut.swaipe.global.exception.user.DuplicateUsernameException;
 import com.donut.swaipe.global.exception.user.LogoutFailedException;
@@ -16,10 +20,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import com.donut.swaipe.global.exception.NoResourceFoundException;
 
 
 @Slf4j
 @RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
 	//	enum으로 정의된 고정 메시지만 사용
@@ -151,5 +159,83 @@ public class GlobalExceptionHandler {
 		log.error("Unexpected error occurred: ", e);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.body(ApiResponse.error(MessageCode.FAILED));
+	}
+
+	/**
+	 * 카카오 API 호출 중 발생하는 예외를 처리합니다.
+	 *
+	 * @param e 카카오 API 호출 실패로 인한 예외
+	 * @return 400 BAD_REQUEST 응답
+	 */
+	@ExceptionHandler(KakaoApiException.class)
+	public ResponseEntity<ApiResponse<Void>> handleKakaoApiException(KakaoApiException e) {
+		log.error("Kakao API error occurred: ", e);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(ApiResponse.error(MessageCode.KAKAO_API_ERROR));
+	}
+
+	/**
+	 * 카카오 토큰을 찾을 수 없을 때 발생하는 예외를 처리합니다.
+	 *
+	 * @param e 카카오 토큰을 찾을 수 없을 때 발생하는 예외
+	 * @return 404 NOT_FOUND 응답
+	 */
+	@ExceptionHandler(KakaoTokenNotFoundException.class)
+	public ResponseEntity<ApiResponse<Void>> handleKakaoTokenNotFoundException(
+			KakaoTokenNotFoundException e) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ApiResponse.error(MessageCode.KAKAO_TOKEN_NOT_FOUND));
+	}
+
+	/**
+	 * 카카오 토큰이 만료되었을 때 발생하는 예외를 처리합니다.
+	 *
+	 * @param e 카카오 토큰 만료로 인한 예외
+	 * @return 401 UNAUTHORIZED 응답
+	 */
+	@ExceptionHandler(KakaoTokenExpiredException.class)
+	public ResponseEntity<ApiResponse<Void>> handleKakaoTokenExpiredException(
+			KakaoTokenExpiredException e) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ApiResponse.error(MessageCode.KAKAO_TOKEN_EXPIRED));
+	}
+
+	/**
+	 * 카카오 인증 실패 시 발생하는 예외를 처리합니다.
+	 *
+	 * @param e 카카오 인증 실패로 인한 예외
+	 * @return 401 UNAUTHORIZED 응답
+	 */
+	@ExceptionHandler(KakaoAuthException.class)
+	public ResponseEntity<ApiResponse<Void>> handleKakaoAuthException(KakaoAuthException e) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ApiResponse.error(MessageCode.KAKAO_AUTH_FAILED));
+	}
+
+	/**
+	 * WebClient 응답 처리 중 발생하는 예외를 처리합니다.
+	 *
+	 * @param e WebClient 응답 처리 실패로 인한 예외
+	 * @return 400 BAD_REQUEST 응답
+	 */
+	@ExceptionHandler(WebClientResponseException.class)
+	public ResponseEntity<ApiResponse<Void>> handleWebClientResponseException(
+			WebClientResponseException e) {
+		log.error("WebClient error occurred: {}", e.getMessage());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(ApiResponse.error(MessageCode.KAKAO_API_ERROR));
+
+	}
+
+	@ExceptionHandler(NoResourceFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleNoResourceFoundException(NoResourceFoundException ex) {
+		// favicon.ico 요청인 경우 204 응답
+		if (ex.getMessage().contains("favicon.ico")) {
+			return ResponseEntity.noContent().build();
+		}
+		
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(ApiResponse.error(MessageCode.RESOURCE_NOT_FOUND));
 	}
 }

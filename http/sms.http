@@ -1,0 +1,48 @@
+### 환경 변수
+@baseUrl = http://localhost:8080
+@phone_number = 01040659916
+@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzOTIyOTQzNDczIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTczOTcxMjc0NiwiaWF0IjoxNzM5NzEwOTQ2fQ.cgEJRhhhYca8R6-udKgC32b-CL4w9EZ60jrUbpbzuo0
+@verification_code = 394104
+
+### 1. 카카오 로그인 및 JWT 토큰 획득
+
+### 2. SMS 인증번호 발송
+POST {{baseUrl}}/api/v1/sms/send
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{jwt_token}}
+
+phoneNumber={{phone_number}}
+
+### 3. SMS 인증번호 검증
+POST {{baseUrl}}/api/v1/sms/verify
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{jwt_token}}
+
+phoneNumber={{phone_number}}&code={{verification_code}}
+
+### 4. SMS 인증번호 검증 (잘못된 코드)
+POST {{baseUrl}}/api/v1/sms/verify
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{jwt_token}}
+
+phoneNumber={{phone_number}}&code=000000
+
+### 5. SMS 중복 요청 테스트
+POST {{baseUrl}}/api/v1/sms/send
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{jwt_token}}
+
+phoneNumber={{phone_number}}
+
+### 6. 만료된 인증번호 검증
+POST {{baseUrl}}/api/v1/sms/verify
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer {{jwt_token}}
+
+phoneNumber={{phone_number}}&code={{verification_code}}
+
+### 테스트 시나리오:
+# 1. kakao.http로 로그인하여 access_token 획득
+# 2. SMS 발송 요청 후 로그에서 인증번호 확인
+# 3. http-client.env.json의 verification_code에 인증번호 입력
+# 4. 각 시나리오 테스트 실행 

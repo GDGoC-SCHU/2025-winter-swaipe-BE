@@ -24,6 +24,11 @@ repositories {
 }
 
 dependencies {
+    // Twilio
+    implementation 'com.twilio.sdk:twilio:9.13.1'
+    implementation 'com.googlecode.libphonenumber:libphonenumber:8.12.30'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'io.projectreactor:reactor-core'
     // Thymleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     // JPA
@@ -53,9 +58,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.redisson:redisson-spring-boot-starter:3.27.0'
     testImplementation 'it.ozimov:embedded-redis:0.7.2'
-    // Firebase Admin SDK
-    implementation 'com.google.firebase:firebase-admin:9.2.0'
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 
     //Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
