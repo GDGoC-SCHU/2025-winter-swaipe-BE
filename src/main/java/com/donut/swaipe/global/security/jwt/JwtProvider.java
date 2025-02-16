@@ -1,6 +1,6 @@
 package com.donut.swaipe.global.security.jwt;
 
-import com.donut.swaipe.domain.user.enums.UserRole;
+import com.donut.swaipe.domain.kakao.entity.KakaoUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -51,16 +51,15 @@ public class JwtProvider {
 	/**
 	 * 액세스 토큰을 생성합니다.
 	 *
-	 * @param username 사용자 아이디
-	 * @param role     사용자 권한
+	 * @param kakaoUser 카카오 사용자 정보
 	 * @return 생성된 액세스 토큰
 	 */
-	public String createAccessToken(String username, UserRole role) {
+	public String createAccessToken(String kakaoUserId) {
 		Date date = new Date();
 
 		return Jwts.builder()
-				.setSubject(username)
-				.claim(AUTHORIZATION_KEY, role)
+				.setSubject(kakaoUserId)
+				.claim(AUTHORIZATION_KEY, "ROLE_USER")
 				.setExpiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))
 				.setIssuedAt(date)
 				.signWith(key, SignatureAlgorithm.HS256)
@@ -70,15 +69,14 @@ public class JwtProvider {
 	/**
 	 * Refresh Token을 생성합니다.
 	 *
-	 * @param username 사용자 이름
-	 * @param role     사용자 역할
+	 * @param kakaoUser 카카오 사용자 정보
 	 */
-	public String createRefreshToken(String username, UserRole role) {
+	public String createRefreshToken(String kakaoUserId) {
 		Date date = new Date();
 
 		return Jwts.builder()
-				.setSubject(username)
-				.claim(AUTHORIZATION_KEY, role)
+				.setSubject(kakaoUserId)
+				.claim(AUTHORIZATION_KEY, "ROLE_USER")
 				.setExpiration(new Date(date.getTime() + REFRESH_TOKEN_TIME))
 				.setIssuedAt(date)
 				.signWith(key, SignatureAlgorithm.HS256)
@@ -86,11 +84,11 @@ public class JwtProvider {
 	}
 
 	/**
-	 * 토큰에서 사용자 이름을 추출합니다.
+	 * 토큰에서 카카오 ID를 추출합니다.
 	 *
 	 * @param token JWT 토큰
 	 */
-	public String getUsernameFromToken(String token) {
+	public String getKakaoIdFromToken(String token) {
 		try {
 			Claims claims = Jwts.parserBuilder()
 					.setSigningKey(key)
@@ -102,20 +100,6 @@ public class JwtProvider {
 			// 토큰이 만료된 경우에도 사용자 정보 반환
 			return e.getClaims().getSubject();
 		}
-	}
-
-	/**
-	 * 토큰에서 사용자 역할을 추출합니다.
-	 *
-	 * @param token JWT 토큰
-	 */
-	public UserRole getRoleFromToken(String token) {
-		Claims claims = Jwts.parserBuilder()
-				.setSigningKey(key)
-				.build()
-				.parseClaimsJws(token)
-				.getBody();
-		return UserRole.valueOf(claims.get(AUTHORIZATION_KEY, String.class));
 	}
 
 	/**
@@ -140,36 +124,47 @@ public class JwtProvider {
 	}
 
 	/**
-	 * 특정 사용자의 Refresh Token이 Redis에 존재하는지 확인합니다.
-	 *
-	 * @param username 사용자 이름
+	 * 토큰의 남은 만료 시간을 반환합니다.
 	 */
-	public boolean hasRefreshToken(String username) {
-		return Boolean.TRUE.equals(redisTemplate.hasKey(username));
+	public Long getAccessTokenExpiration() {
+		return ACCESS_TOKEN_TIME;
 	}
 
-	/**
-	 * 토큰의 남은 만료 시간을 반환합니다.
-	 *
-	 * @param token JWT 토큰
-	 */
-	public Long getExpirationFromToken(String token) {
+	public Long getRefreshTokenExpiration() {
+		return REFRESH_TOKEN_TIME;
+	}
+
+	public boolean isTokenExpired(String token) {
 		try {
 			Claims claims = Jwts.parserBuilder()
 					.setSigningKey(key)
 					.build()
 					.parseClaimsJws(token)
 					.getBody();
-
-			Date expiration = claims.getExpiration();
-			Date now = new Date();
-
-			return expiration.getTime() - now.getTime();
+			return claims.getExpiration().before(new Date());
 		} catch (ExpiredJwtException e) {
-			return 0L;
+			return true;
+		}
+	}
+
+	public String reissueAccessToken(String kakaoId) {
+		return createAccessToken(kakaoId);
+	}
+
+	public String getRefreshToken(String kakaoId) {
+		return redisTemplate.opsForValue().get("RT:" + kakaoId);
+	}
+
+	public boolean validateRefreshToken(String refreshToken) {
+		try {
+			Jwts.parserBuilder()
+					.setSigningKey(key)
+					.build()
+					.parseClaimsJws(refreshToken);
+			return true;
 		} catch (Exception e) {
-			log.error("토큰 만료 시간 추출 중 에러 발생: {}", e.getMessage());
-			return 0L;
+			log.error("Refresh 토큰 검증 실패: {}", e.getMessage());
+			return false;
 		}
 	}
 }

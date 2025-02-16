@@ -7,28 +7,43 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    check-template-location: true
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
       repositories:
-        enabled: false
-
+        enabled: true
   sql:
     init:
       encoding: UTF-8
-
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  profiles:
+    active: local  # 개발 환경에서는 local로 설정
 
 logging:
   level:
-    org.springframework.cache: trace
+    com.donut.swaipe: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    com.donut.swaipe.domain.stdCard.service: DEBUG
 
 jwt-secret-key: ${JWT_KEY}
+
+kakao:
+  client:
+    id: ${KAKAO_CLIENT_ID}  # 실제 값이 주입되었는지 확인
+    secret: ${KAKAO_CLIENT_SECRET}  # 실제 값이 주입되었는지 확인
+  redirect-uri: http://localhost:8080/api/auth/kakao/callback  # 카카오 개발자 콘솔과 일치하는지 확인
 
 springdoc:
   swagger-ui:
@@ -45,10 +60,22 @@ springdoc:
   default-produces-media-type: application/json
   paths-to-match:
     - /users/**
+    - /api/v1/notifications/**
     - /v3/api-docs/**
     - /v3/api-docs.yaml
     - /swagger-resources/**
     - /swagger-ui/**
     - /webjars/**
   show-actuator: false
-  packages-to-scan: com.donut.swab
+  packages-to-scan: com.donut.swaipe
+
+twilio:
+  account-sid: ${TWILIO_ACCOUNT_SID}
+  auth-token: ${TWILIO_AUTH_TOKEN}
+  phone-number: ${TWILIO_PHONE_NUMBER}  # Twilio에서 제공한 번호를 정확히 입력 (+1로 시작)
+
+univCert:
+  api-key: ${UNIV_KEY}
+app:
+  upload:
+    dir: ${user.home}/uploads/student-cards

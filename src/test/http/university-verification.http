@@ -1,0 +1,49 @@
+### 환경 변수
+@access_token = eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzOTIyOTQzNDczIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTczOTcyNjMwMiwiaWF0IjoxNzM5NzI0NTAyfQ.V9hHpiQKQt5PYARvjJd9vLWAYFIXT1pSSfZQOCGFups
+
+### 1. 대학교 이메일 인증 요청 (인증번호 발송)
+POST http://localhost:8080/api/verify/university-email
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "email": "20195294@sch.ac.kr"
+}
+
+### 2. 인증번호 확인
+POST http://localhost:8080/api/verify/university-email/code
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "email": "20195294@sch.ac.kr",
+  "univName": "순천향대학교",
+  "code": "1234"
+}
+
+### 잘못된 이메일 형식 테스트
+POST http://localhost:8080/api/verify/university-email
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "email": "invalid-email"
+}
+
+### 잘못된 도메인 테스트 (ac.kr이 아닌 경우)
+POST http://localhost:8080/api/verify/university-email
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "email": "20191234@gmail.com"
+}
+
+### 빈 이메일 테스트
+POST http://localhost:8080/api/verify/university-email
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "email": ""
+}

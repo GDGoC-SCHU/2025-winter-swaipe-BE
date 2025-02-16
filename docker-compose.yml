@@ -17,6 +17,10 @@ services:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
       JWT_KEY: ${JWT_KEY}
+      FIREBASE_CREDENTIALS_PATH: ${FIREBASE_CREDENTIALS_PATH}  # Firebase 설정 파일 경로
+      FIREBASE_SERVER_KEY: ${FIREBASE_SERVER_KEY}
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json  # Firebase 인증 파일 마운트
     depends_on:
       - mysql
       - redis
